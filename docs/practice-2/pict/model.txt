@@ -1,0 +1,23 @@
+# PICT model: Authorization decision (POST /api/internal/authorize)
+# amount_vs_*: relation of the transaction amount to the card limit / balance
+# expiry: valid = card valid for months ahead, current_month = last valid month,
+#         expired = month of expiry is before the transaction month
+
+card_status:        ACTIVE, INACTIVE, BLOCKED, EXPIRED
+amount_vs_daily:    below, equal, above
+amount_vs_monthly:  below, equal, above
+amount_vs_balance:  below, equal, above
+expiry:             valid, current_month, expired
+terminal_type:      POS, ATM, ECOM
+mcc:                grocery, restaurant, electronics, travel
+
+# A card that is not ACTIVE is declined by status, so limits, balance and expiry
+# must not add a second reason for the decline.
+IF [card_status] <> "ACTIVE" THEN [amount_vs_daily] = "below" AND [amount_vs_monthly] = "below" AND [amount_vs_balance] = "below" AND [expiry] = "valid";
+
+# An expired card is declined by expiry, no second reason.
+IF [expiry] = "expired" THEN [amount_vs_daily] = "below" AND [amount_vs_monthly] = "below" AND [amount_vs_balance] = "below";
+
+# At most one of the three amount checks fails in one test (single invalid class per test).
+IF [amount_vs_balance] = "above" THEN [amount_vs_daily] <> "above" AND [amount_vs_monthly] <> "above";
+IF [amount_vs_daily] = "above" THEN [amount_vs_monthly] <> "above";
