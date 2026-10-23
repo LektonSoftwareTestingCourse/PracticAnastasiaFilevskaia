@@ -1,7 +1,3 @@
-# PICT model: card creation (POST /api/cards)
-# Values with the ~ prefix are invalid. PICT puts every invalid value into its own test
-# and keeps all other parameters valid, so one test has one failing reason.
-
 Bin:            400000, ~40000, ~4000000, ~40000A
 CardholderName: IVAN IVANOV, ANNA-MARIA O'NEIL, ~ivan ivanov, ~IVAN 123
 CurrencyCode:   643, 840, ~64, ~6430
@@ -9,7 +5,5 @@ DailyLimit:     1, 15000000, 0, ~-1
 MonthlyLimit:   1, 300000000, 0, ~-1
 InitialBalance: 100000000, 0
 
-# Monthly limit must not be lower than daily limit (valid combinations only).
-# The rules are written per value so that the invalid value ~-1 of MonthlyLimit is kept.
 IF [DailyLimit] = 15000000 THEN [MonthlyLimit] <> 1 AND [MonthlyLimit] <> 0;
 IF [DailyLimit] = 1 THEN [MonthlyLimit] <> 0;
